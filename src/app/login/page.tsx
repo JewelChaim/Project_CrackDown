@@ -8,6 +8,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@jewelhc.com");
   const [password, setPassword] = useState("");
+
   return (
     <Card className="max-w-md mx-auto">
       <CardBody>
