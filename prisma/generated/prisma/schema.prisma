@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(MANAGER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  HR
+  MANAGER
+}
+
+model Facility {
+  id        String     @id @default(cuid())
+  name      String
+  createdAt DateTime   @default(now())
+  employees Employee[]
+}
+
+model Employee {
+  id         String    @id @default(cuid())
+  name       String
+  phone      String?
+  staffType  StaffType
+  facilityId String
+  facility   Facility  @relation(fields: [facilityId], references: [id])
+  createdAt  DateTime  @default(now())
+}
+
+enum StaffType {
+  INTERNAL
+  AGENCY
+}
+
+model Survey {
+  id        String           @id @default(cuid())
+  title     String
+  createdBy String
+  createdAt DateTime         @default(now())
+  responses SurveyResponse[]
+}
+
+model SurveyResponse {
+  id         String   @id @default(cuid())
+  surveyId   String
+  survey     Survey   @relation(fields: [surveyId], references: [id])
+  employeeId String?
+  payload    Json
+  createdAt  DateTime @default(now())
+}
