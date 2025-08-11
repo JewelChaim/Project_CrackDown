@@ -1,9 +1,8 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions, type Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -24,13 +23,13 @@ export const authOptions: NextAuthOptions = {
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.role = (user as any).role;
+    async jwt({ token, user }: { token: JWT; user?: { role?: string } }) {
+      if (user) token.role = user.role;
       return token;
     },
-    async session({ session, token }) {
-      // @ts-ignore add role onto session
-      session.user = { ...session.user, role: (token as any).role };
+    async session({ session, token }: { session: Session; token: JWT & { role?: string } }) {
+      // @ts-expect-error augment session user with role
+      session.user = { ...session.user, role: token.role };
       return session;
     }
   },
