@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <g fill="#0EA5A6">
+    <path d="M20 2 L38 2 L58 20 L38 38 L20 38 L2 20 Z"/>
+    <path d="M20 10 L30 20 L20 30 L10 20 Z" fill="#0B7B7E"/>
+    <text x="80" y="28" font-family="sans-serif" font-size="24" fill="#0EA5A6">Jewel</text>
+  </g>
+</svg>
