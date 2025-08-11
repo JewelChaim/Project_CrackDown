@@ -1,21 +1,17 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import AppNav from "@/components/AppNav";
 import Providers from "./providers";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Project CrackDown",
-  description: "Jewel Healthcare internal app",
-};
+export const metadata = { title: "Jewel Healthcare — Project CrackDown", description: "Internal QA & Onboarding" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>{children}</Providers>
+      <body className="min-h-dvh antialiased">
+        {/* @ts-expect-error Server Component */}
+        <AppNav />
+        <main className="container py-8"><div className="mx-auto max-w-6xl space-y-8">{children}</div></main>
+        <Providers>{/* client providers here */}</Providers>
       </body>
     </html>
   );
