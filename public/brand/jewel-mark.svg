@@ -1,0 +1,6 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Jewel">
+  <defs><linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#0EA5A6"/></linearGradient></defs>
+  <path d="M32 6l12 12-12 12L20 18 32 6z" fill="url(#m)" opacity=".95"/>
+  <path d="M20 18l12 12-12 12L8 30 20 18z" fill="#0B7B7E" opacity=".75"/>
+  <path d="M44 18l12 12-12 12-12-12 12-12z" fill="#93F5F8" opacity=".45"/>
+</svg>

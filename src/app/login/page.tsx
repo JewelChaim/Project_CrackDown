@@ -1,18 +1,24 @@
 "use client";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import { Card, CardBody } from "@/components/ui/Card";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@jewelhc.com");
   const [password, setPassword] = useState("");
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Login</h1>
-      <input placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} />
-      <button onClick={()=>signIn("credentials", { email, password, callbackUrl: "/" })}>
-        Sign in
-      </button>
-    </main>
+    <Card className="max-w-md mx-auto">
+      <CardBody>
+        <h1 className="text-2xl font-semibold mb-6">Sign in</h1>
+        <div className="space-y-3">
+          <Input placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+          <Input placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)} />
+          <Button onClick={()=>signIn("credentials", { email, password, callbackUrl: "/admin" })}>Continue</Button>
+        </div>
+        <p className="text-xs text-teal-100/60 mt-4">Dev mode: password not validated; email must exist.</p>
+      </CardBody>
+    </Card>
   );
 }
