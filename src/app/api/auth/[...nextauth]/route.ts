@@ -31,7 +31,8 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user = { ...session.user, role: (token as { role?: string }).role } as typeof session.user & { role?: string };
+      const user = (session.user ?? {}) as typeof session.user & { role?: string };
+      session.user = { ...user, role: (token as { role?: string }).role };
       return session;
     }
   },
