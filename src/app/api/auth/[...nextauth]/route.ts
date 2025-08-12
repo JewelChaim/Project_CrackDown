@@ -34,7 +34,8 @@ export const authOptions: NextAuthOptions = {
       return session;
     }
   },
-  secret: process.env.NEXTAUTH_SECRET
+  // Use a constant fallback secret in development to avoid JWT decryption errors
+  secret: process.env.NEXTAUTH_SECRET ?? "insecure-dev-secret"
 };
 
 const handler = NextAuth(authOptions);
