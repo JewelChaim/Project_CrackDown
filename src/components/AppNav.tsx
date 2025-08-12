@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function AppNav() {
   const session = await getServerSession(authOptions);
-  const role = (session as any)?.user?.role;
+  const role = (session?.user as { role?: string } | undefined)?.role;
 
   return (
     <header className="sticky top-0 z-40 grad-hero border-b border-panel">

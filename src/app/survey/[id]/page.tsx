@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { notFound, redirect } from "next/navigation";
 import { Card, CardBody } from "@/components/ui/Card";
 import Textarea from "@/components/ui/Textarea";
@@ -13,8 +13,8 @@ export default async function PublicSurvey({ params, searchParams }: { params: {
   async function submit(formData: FormData) {
     "use server";
     const payloadTxt = String(formData.get("payload") || "{}");
-    let json: any = {};
-    try { json = JSON.parse(payloadTxt); } catch { json = { text: payloadTxt }; }
+    let json: Prisma.JsonValue = {};
+    try { json = JSON.parse(payloadTxt) as Prisma.JsonValue; } catch { json = { text: payloadTxt }; }
     const p = new PrismaClient();
     await p.surveyResponse.create({ data: { surveyId: survey.id, payload: json } });
     redirect(`/survey/${survey.id}?ok=1`);

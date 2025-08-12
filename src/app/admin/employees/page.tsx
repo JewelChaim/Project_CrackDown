@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 async function ensureAdmin() {
   const session = await getSession();
-  const role = (session as any)?.user?.role;
+  const role = (session?.user as { role?: string } | undefined)?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
 }
@@ -26,7 +26,7 @@ export default async function EmployeesPage() {
     const name = String(formData.get("name")||"").trim();
     const phone = String(formData.get("phone")||"").trim() || null;
     const facilityId = String(formData.get("facilityId")||"");
-    const staffType = String(formData.get("staffType")||"INTERNAL") as any;
+    const staffType = String(formData.get("staffType")||"INTERNAL") as "INTERNAL" | "AGENCY";
     if (!name || !facilityId) return;
     const p = new PrismaClient();
     await p.employee.create({ data: { name, phone, facilityId, staffType } });
