@@ -1,13 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { Stat } from "@/components/ui/Card";
 
-const prisma = new PrismaClient();
-
 export default async function AdminHome() {
   const session = await getSession();
-  const role = (session as any)?.user?.role;
+  const role = (session?.user as { role?: string } | undefined)?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
 

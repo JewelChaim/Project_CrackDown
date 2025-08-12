@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const prisma = new PrismaClient();
   const rows = await prisma.surveyResponse.findMany({ where: { surveyId: params.id }, orderBy: { createdAt: "desc" } });
 
   const headers = ["createdAt", "payload"];

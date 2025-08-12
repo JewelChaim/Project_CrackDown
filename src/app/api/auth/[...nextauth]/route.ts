@@ -1,9 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -25,16 +23,19 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.role = (user as any).role;
+      if (user && "role" in user) {
+        token.role = (user as { role?: string }).role;
+      }
       return token;
     },
     async session({ session, token }) {
-      // @ts-ignore add role onto session
-      session.user = { ...session.user, role: (token as any).role };
+      const user = (session.user ?? {}) as typeof session.user & { role?: string };
+      session.user = { ...user, role: (token as { role?: string }).role };
       return session;
     }
   },
-  secret: process.env.NEXTAUTH_SECRET
+  // Use a constant fallback secret in development to avoid JWT decryption errors
+  secret: process.env.NEXTAUTH_SECRET ?? "insecure-dev-secret"
 };
 
 const handler = NextAuth(authOptions);
