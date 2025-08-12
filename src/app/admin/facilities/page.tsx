@@ -1,61 +1,102 @@
 import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import Button from "@/components/ui/Button";
+import { revalidatePath } from "next/cache";
 import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
+import { Card, CardBody } from "@/components/ui/Card";
 
 const prisma = new PrismaClient();
 
-async function ensureAdmin() {
-  const session = await getSession();
-  const role = (session as any)?.user?.role;
-  if (!session) redirect("/login");
-  if (role !== "ADMIN") redirect("/");
+async function addFacility(formData: FormData) {
+  "use server";
+  const name = formData.get("name") as string;
+  const address = formData.get("address") as string | null;
+  const capacityStr = formData.get("capacity") as string | null;
+  const capacity = capacityStr ? Number(capacityStr) : null;
+  await prisma.facility.create({
+    data: { name, address: address || undefined, capacity: capacity ?? undefined },
+  });
+  revalidatePath("/admin/facilities");
+}
+
+async function deleteFacility(id: string) {
+  "use server";
+  await prisma.facility.delete({ where: { id } });
+  revalidatePath("/admin/facilities");
 }
 
 export default async function FacilitiesPage() {
-  await ensureAdmin();
-  const facilities = await prisma.facility.findMany({ orderBy: { createdAt: "desc" } });
+  const session = await getSession();
+  if (!session) redirect("/login");
+  const role = (session.user as { role?: string })?.role;
+  if (role !== "ADMIN") redirect("/");
 
-  async function createFacility(formData: FormData) {
-    "use server";
-    const name = String(formData.get("name") || "").trim();
-    if (!name) return;
-    const p = new PrismaClient();
-    await p.facility.create({ data: { name } });
-    redirect("/admin/facilities");
-  }
-
-  async function deleteFacility(formData: FormData) {
-    "use server";
-    const id = String(formData.get("id") || "");
-    const p = new PrismaClient();
-    await p.employee.deleteMany({ where: { facilityId: id } });
-    await p.facility.delete({ where: { id } });
-    redirect("/admin/facilities");
-  }
+  const facilities = await prisma.facility.findMany();
 
   return (
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Facilities</h1>
-
-      <form action={createFacility} className="flex gap-2 max-w-xl">
-        <Input name="name" placeholder="New facility name" />
-        <Button type="submit">Add</Button>
-      </form>
-
-      <div className="divide-y border border-panel rounded bg-panel">
-        {facilities.map(f => (
-          <div key={f.id} className="flex items-center justify-between p-3">
-            <div>{f.name}</div>
-            <form action={deleteFacility}>
-              <input type="hidden" name="id" value={f.id} />
-              <Button variant="destructive">Delete</Button>
-            </form>
-          </div>
-        ))}
-        {facilities.length === 0 && <div className="p-3 text-teal-100/60">No facilities yet.</div>}
-      </div>
+      <Card>
+        <CardBody>
+          <form action={addFacility} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-1">
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" name="name" required />
+            </div>
+            <div className="md:col-span-1">
+              <Label htmlFor="address">Address</Label>
+              <Input id="address" name="address" />
+            </div>
+            <div className="md:col-span-1">
+              <Label htmlFor="capacity">Capacity</Label>
+              <Input id="capacity" name="capacity" type="number" />
+            </div>
+            <div className="md:col-span-3">
+              <Button type="submit">Add Facility</Button>
+            </div>
+          </form>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardBody className="p-0 overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-panel">
+              <tr>
+                <th className="p-2">Name</th>
+                <th className="p-2">Address</th>
+                <th className="p-2">Capacity</th>
+                <th className="p-2 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {facilities.map((f) => (
+                <tr key={f.id} className="border-t border-panel hover:bg-panel/50">
+                  <td className="p-2">{f.name}</td>
+                  <td className="p-2">{f.address || "-"}</td>
+                  <td className="p-2">
+                    {typeof f.capacity === "number" ? f.capacity : "-"}
+                  </td>
+                  <td className="p-2 text-right">
+                    <a
+                      href={`/admin/facilities/${f.id}`}
+                      className="underline mr-2"
+                    >
+                      Edit
+                    </a>
+                    <form action={deleteFacility.bind(null, f.id)} className="inline">
+                      <Button variant="destructive" type="submit">
+                        Delete
+                      </Button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardBody>
+      </Card>
     </main>
   );
 }

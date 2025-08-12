@@ -20,6 +20,15 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## HRIS Features
+
+The application now includes a lightweight HRIS layer with:
+
+- Employee and facility management dashboards
+- Configurable surveys with public links and 1–5 rating questions
+- Performance review cycles and reviewer feedback collection
+- 1:1 meeting scheduling with note tracking
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

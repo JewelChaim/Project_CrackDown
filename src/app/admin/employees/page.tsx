@@ -1,82 +1,136 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, StaffType } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import Button from "@/components/ui/Button";
+import { revalidatePath } from "next/cache";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
+import { Card, CardBody } from "@/components/ui/Card";
 
 const prisma = new PrismaClient();
 
-async function ensureAdmin() {
-  const session = await getSession();
-  const role = (session as any)?.user?.role;
-  if (!session) redirect("/login");
-  if (role !== "ADMIN") redirect("/");
+async function addEmployee(formData: FormData) {
+  "use server";
+  const name = formData.get("name") as string;
+  const facilityId = formData.get("facilityId") as string;
+  const staffType = formData.get("staffType") as StaffType;
+  const phone = formData.get("phone") as string | null;
+  const managerId = formData.get("managerId") as string | null;
+  await prisma.employee.create({
+    data: {
+      name,
+      facilityId,
+      staffType,
+      phone: phone || undefined,
+      managerId: managerId || undefined,
+    },
+  });
+  revalidatePath("/admin/employees");
+}
+
+async function deleteEmployee(id: string) {
+  "use server";
+  await prisma.employee.delete({ where: { id } });
+  revalidatePath("/admin/employees");
 }
 
 export default async function EmployeesPage() {
-  await ensureAdmin();
+  const session = await getSession();
+  if (!session) redirect("/login");
+  const role = (session.user as { role?: string })?.role;
+  if (role !== "ADMIN") redirect("/");
+
   const [employees, facilities] = await Promise.all([
-    prisma.employee.findMany({ include: { facility: true }, orderBy: { createdAt: "desc" } }),
-    prisma.facility.findMany({ orderBy: { name: "asc" } }),
+    prisma.employee.findMany({ include: { facility: true, manager: true } }),
+    prisma.facility.findMany(),
   ]);
-
-  async function createEmployee(formData: FormData) {
-    "use server";
-    const name = String(formData.get("name")||"").trim();
-    const phone = String(formData.get("phone")||"").trim() || null;
-    const facilityId = String(formData.get("facilityId")||"");
-    const staffType = String(formData.get("staffType")||"INTERNAL") as any;
-    if (!name || !facilityId) return;
-    const p = new PrismaClient();
-    await p.employee.create({ data: { name, phone, facilityId, staffType } });
-    redirect("/admin/employees");
-  }
-
-  async function deleteEmployee(formData: FormData) {
-    "use server";
-    const id = String(formData.get("id")||"");
-    const p = new PrismaClient();
-    await p.employee.delete({ where: { id } });
-    redirect("/admin/employees");
-  }
 
   return (
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Employees</h1>
-
-      <form action={createEmployee} className="grid grid-cols-5 gap-2 max-w-5xl">
-        <Input name="name" placeholder="Full name" className="col-span-2" />
-        <Input name="phone" placeholder="Phone (optional)" />
-        <Select name="facilityId">
-          <option value="">Choose facility</option>
-          {facilities.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
-        </Select>
-        <Select name="staffType">
-          <option value="INTERNAL">Internal</option>
-          <option value="AGENCY">Agency</option>
-        </Select>
-        <div className="col-span-5">
-          <Button type="submit">Add</Button>
-        </div>
-      </form>
-
-      <div className="divide-y border border-panel rounded bg-panel">
-        {employees.map(e => (
-          <div key={e.id} className="flex items-center justify-between p-3">
+      <Card>
+        <CardBody>
+          <form action={addEmployee} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <div className="font-medium">{e.name} <span className="text-xs text-teal-100/60">({e.staffType})</span></div>
-              <div className="text-sm text-teal-100/60">{e.facility?.name}</div>
-              {e.phone && <div className="text-sm text-teal-100/60">{e.phone}</div>}
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" name="name" required />
             </div>
-            <form action={deleteEmployee}>
-              <input type="hidden" name="id" value={e.id} />
-              <Button variant="destructive">Delete</Button>
-            </form>
-          </div>
-        ))}
-        {employees.length === 0 && <div className="p-3 text-teal-100/60">No employees yet.</div>}
-      </div>
+            <div>
+              <Label htmlFor="phone">Phone</Label>
+              <Input id="phone" name="phone" />
+            </div>
+            <div>
+              <Label htmlFor="facilityId">Facility</Label>
+              <Select id="facilityId" name="facilityId" required>
+                <option value="">Select facility</option>
+                {facilities.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="managerId">Manager</Label>
+              <Select id="managerId" name="managerId">
+                <option value="">Optional</option>
+                {employees.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="staffType">Staff Type</Label>
+              <Select id="staffType" name="staffType" required>
+                <option value="INTERNAL">Internal</option>
+                <option value="AGENCY">Agency</option>
+              </Select>
+            </div>
+            <div className="md:col-span-2">
+              <Button type="submit">Add Employee</Button>
+            </div>
+          </form>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardBody className="p-0 overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-panel">
+              <tr>
+                <th className="p-2">Name</th>
+                <th className="p-2">Facility</th>
+                <th className="p-2">Manager</th>
+                <th className="p-2 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((e) => (
+                <tr key={e.id} className="border-t border-panel hover:bg-panel/50">
+                  <td className="p-2">{e.name}</td>
+                  <td className="p-2">{e.facility.name}</td>
+                  <td className="p-2">{e.manager ? e.manager.name : "-"}</td>
+                  <td className="p-2 text-right">
+                    <a
+                      href={`/admin/employees/${e.id}`}
+                      className="underline mr-2"
+                    >
+                      Edit
+                    </a>
+                    <form action={deleteEmployee.bind(null, e.id)} className="inline">
+                      <Button variant="destructive" type="submit">
+                        Delete
+                      </Button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardBody>
+      </Card>
     </main>
   );
 }

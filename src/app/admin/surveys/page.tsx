@@ -1,62 +1,80 @@
 import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import QRCode from "qrcode";
-import Button from "@/components/ui/Button";
+import { revalidatePath } from "next/cache";
 import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import Button from "@/components/ui/Button";
 
 const prisma = new PrismaClient();
 
-async function ensureAdmin() {
+async function addSurvey(formData: FormData) {
+  "use server";
+  const title = formData.get("title") as string;
+  const questions = (formData.get("questions") as string)
+    .split("\n")
+    .map((q) => q.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [prompt, type] = line.split("|").map((s) => s.trim());
+      return { prompt, type: type === "scale" ? "scale" : "text" };
+    });
   const session = await getSession();
-  const role = (session as any)?.user?.role;
-  if (!session) redirect("/login");
-  if (role !== "ADMIN") redirect("/");
-  return session;
+  const createdBy = (session?.user as { email?: string })?.email || "unknown";
+  await prisma.survey.create({ data: { title, questions, createdBy } });
+  revalidatePath("/admin/surveys");
 }
 
-export default async function SurveysPage() {
-  const session = await ensureAdmin();
-  const surveys = await prisma.survey.findMany({ orderBy: { createdAt: "desc" } });
+async function deleteSurvey(id: string) {
+  "use server";
+  await prisma.survey.delete({ where: { id } });
+  revalidatePath("/admin/surveys");
+}
 
-  async function createSurvey(formData: FormData) {
-    "use server";
-    const title = String(formData.get("title")||"").trim();
-    if (!title) return;
-    const p = new PrismaClient();
-    await p.survey.create({ data: { title, createdBy: (session as any)?.user?.email || "admin" } });
-    redirect("/admin/surveys");
-  }
+export default async function SurveysAdmin() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+  const role = (session.user as { role?: string })?.role;
+  if (role !== "ADMIN") redirect("/");
+
+  const surveys = await prisma.survey.findMany();
 
   return (
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Surveys</h1>
-      <form action={createSurvey} className="flex gap-2 max-w-xl">
-        <Input name="title" placeholder="New survey title" />
-        <Button type="submit">Create</Button>
+      <form action={addSurvey} className="space-y-2">
+        <Input name="title" placeholder="Title" required />
+        <Textarea
+          name="questions"
+          placeholder="One question per line. Add '|scale' for 1-5 rating."
+          required
+        />
+        <Button type="submit">Create Survey</Button>
       </form>
-
-      <ul className="space-y-4">
-        {await Promise.all(surveys.map(async s => {
-          const href = `/survey/${s.id}`;
-          const qr = await QRCode.toDataURL(href);
-          return (
-            <li key={s.id} className="border border-panel rounded bg-panel p-4">
-              <div className="flex items-start gap-4">
-                <img src={qr} alt="QR" className="w-24 h-24 border border-panel rounded bg-white" />
-                <div className="flex-1">
-                  <div className="font-medium">{s.title}</div>
-                  <div className="text-sm text-teal-100/60">
-                    Link: <a className="underline" href={href}>{href}</a>
-                  </div>
-                  <div className="text-sm text-teal-100/60">
-                    <a className="underline" href={`/api/export/survey/${s.id}`}>Download CSV</a>
-                  </div>
-                </div>
-              </div>
-            </li>
-          );
-        }))}
+      <ul className="space-y-2">
+        {surveys.map((s) => (
+          <li
+            key={s.id}
+            className="bg-panel border border-panel rounded-lg p-2 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <a href={`/surveys/${s.id}`} className="underline">
+                {s.title}
+              </a>
+              <a
+                href={`/survey/${s.id}`}
+                className="text-xs underline text-teal-200"
+              >
+                public link
+              </a>
+            </div>
+            <form action={deleteSurvey.bind(null, s.id)}>
+              <Button variant="destructive" type="submit">
+                Delete
+              </Button>
+            </form>
+          </li>
+        ))}
       </ul>
     </main>
   );
