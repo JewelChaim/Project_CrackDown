@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
-
-const prisma = new PrismaClient();
 
 async function ensureAdmin() {
   const session = await getSession();
@@ -28,16 +26,14 @@ export default async function EmployeesPage() {
     const facilityId = String(formData.get("facilityId")||"");
     const staffType = String(formData.get("staffType")||"INTERNAL") as "INTERNAL" | "AGENCY";
     if (!name || !facilityId) return;
-    const p = new PrismaClient();
-    await p.employee.create({ data: { name, phone, facilityId, staffType } });
+    await prisma.employee.create({ data: { name, phone, facilityId, staffType } });
     redirect("/admin/employees");
   }
 
   async function deleteEmployee(formData: FormData) {
     "use server";
     const id = String(formData.get("id")||"");
-    const p = new PrismaClient();
-    await p.employee.delete({ where: { id } });
+    await prisma.employee.delete({ where: { id } });
     redirect("/admin/employees");
   }
 
