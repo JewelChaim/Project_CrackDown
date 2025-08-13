@@ -1,8 +1,14 @@
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
+import { getSession } from "@/lib/auth";
+
+const prisma = new PrismaClient();
+
+async function ensureAdmin() {
+  const session = await getSession();
+  const role = (session as any)?.user?.role;
+  if (!session) redirect("/login");
+  if (role !== "ADMIN") redirect("/");
+}
 
 export default async function FacilitiesPage() {
   await requireAdmin();
@@ -47,13 +53,8 @@ export default async function FacilitiesPage() {
 
       <div className="divide-y border border-panel rounded bg-panel">
         {facilities.map(f => (
-          <div key={f.id} className="flex items-center gap-2 p-3">
-            <form action={updateFacility} className="flex-1 flex items-center gap-2">
-              <Input name="name" defaultValue={f.name} className="flex-1" />
-              <input type="hidden" name="id" value={f.id} />
-              <Button type="submit" variant="ghost" className="text-xs">Save</Button>
-            </form>
-            <div className="text-sm text-teal-100/70 w-24 text-center">{f._count.employees} staff</div>
+          <li key={f.id} className="flex items-center justify-between border p-3 rounded">
+            <div>{f.name}</div>
             <form action={deleteFacility}>
               <input type="hidden" name="id" value={f.id} />
               <Button variant="destructive">Delete</Button>

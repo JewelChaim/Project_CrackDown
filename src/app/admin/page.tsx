@@ -1,15 +1,11 @@
-import { Stat } from "@/components/ui/Card";
-import { requireAdmin } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 
 export default async function AdminHome() {
-  await requireAdmin();
-
-  const [facilityCount, employeeCount, surveyCount] = await Promise.all([
-    prisma.facility.count(),
-    prisma.employee.count(),
-    prisma.survey.count(),
-  ]);
+  const session = await getSession();
+  const role = (session as any)?.user?.role;
+  if (!session) redirect("/login");
+  if (role !== "ADMIN") redirect("/");
 
   return (
     <main className="space-y-6">

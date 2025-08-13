@@ -1,32 +1,30 @@
+import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 import QRCode from "qrcode";
-import Image from "next/image";
-import { requireAdmin } from "@/lib/auth";
-import prisma from "@/lib/prisma";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import CopyButton from "@/components/ui/CopyButton";
+
+const prisma = new PrismaClient();
+
+async function ensureAdmin() {
+  const session = await getSession();
+  const role = (session as any)?.user?.role;
+  if (!session) redirect("/login");
+  if (role !== "ADMIN") redirect("/");
+  return session;
+}
 
 export default async function SurveysPage() {
-  const session = await requireAdmin();
-  const surveys = await prisma.survey.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { _count: { select: { responses: true } } }
-  });
+  const session = await ensureAdmin();
+  const surveys = await prisma.survey.findMany({ orderBy: { createdAt: "desc" } });
 
   async function createSurvey(formData: FormData) {
     "use server";
     const title = String(formData.get("title")||"").trim();
     if (!title) return;
-    await prisma.survey.create({ data: { title, createdBy: session.user.email || "admin" } });
-    redirect("/admin/surveys");
-  }
-
-  async function deleteSurvey(formData: FormData) {
-    "use server";
-    const id = String(formData.get("id") || "");
-    await prisma.surveyResponse.deleteMany({ where: { surveyId: id } });
-    await prisma.survey.delete({ where: { id } });
+    const p = new PrismaClient();
+    await p.survey.create({ data: { title, createdBy: (session as any)?.user?.email || "admin" } });
     redirect("/admin/surveys");
   }
 
@@ -45,22 +43,14 @@ export default async function SurveysPage() {
           return (
             <li key={s.id} className="border border-panel rounded bg-panel p-4">
               <div className="flex items-start gap-4">
-                <Image src={qr} alt="QR" width={96} height={96} className="w-24 h-24 border border-panel rounded bg-white" />
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="font-medium">{s.title}</div>
-                    <div className="text-xs text-teal-100/60">{s._count.responses} responses</div>
+                <img src={qr} alt="QR" className="w-24 h-24 border border-panel rounded bg-white" />
+                <div className="flex-1">
+                  <div className="font-medium">{s.title}</div>
+                  <div className="text-sm text-teal-100/60">
+                    Link: <a className="underline" href={href}>{href}</a>
                   </div>
-                  <div className="text-sm text-teal-100/60 flex items-center gap-2">
-                    <a className="underline" href={href}>{href}</a>
-                    <CopyButton value={href} />
-                  </div>
-                  <div className="text-sm text-teal-100/60 flex items-center gap-3">
+                  <div className="text-sm text-teal-100/60">
                     <a className="underline" href={`/api/export/survey/${s.id}`}>Download CSV</a>
-                    <form action={deleteSurvey} className="inline">
-                      <input type="hidden" name="id" value={s.id} />
-                      <Button variant="destructive" className="text-xs">Delete</Button>
-                    </form>
                   </div>
                 </div>
               </div>
