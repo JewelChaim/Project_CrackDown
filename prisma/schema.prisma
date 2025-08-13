@@ -25,6 +25,8 @@ enum Role {
 model Facility {
   id        String    @id @default(cuid())
   name      String
+  address   String?
+  capacity  Int?
   createdAt DateTime  @default(now())
   employees Employee[]
 }
@@ -36,6 +38,14 @@ model Employee {
   staffType  StaffType
   facilityId String
   facility   Facility @relation(fields: [facilityId], references: [id])
+  managerId  String?
+  manager    Employee? @relation("EmployeeManager", fields: [managerId], references: [id])
+  reports    Employee[] @relation("EmployeeManager")
+  reviews    Review[]
+  reviewsGiven Review[] @relation("ReviewReviewer")
+  goals      Goal[]
+  oneOnOnesA OneOnOne[] @relation("OneOnOneA")
+  oneOnOnesB OneOnOne[] @relation("OneOnOneB")
   createdAt  DateTime @default(now())
 }
 
@@ -48,6 +58,7 @@ model Survey {
   id        String           @id @default(cuid())
   title     String
   createdBy String
+  questions Json
   createdAt DateTime         @default(now())
   responses SurveyResponse[]
 }
@@ -59,4 +70,39 @@ model SurveyResponse {
   employeeId String?
   payload    Json
   createdAt  DateTime @default(now())
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  reviewerId String
+  reviewer   Employee @relation("ReviewReviewer", fields: [reviewerId], references: [id])
+  period     String
+  feedback   String
+  createdAt  DateTime @default(now())
+}
+
+model OneOnOne {
+  id             String   @id @default(cuid())
+  participantAId String
+  participantA   Employee @relation("OneOnOneA", fields: [participantAId], references: [id])
+  participantBId String
+  participantB   Employee @relation("OneOnOneB", fields: [participantBId], references: [id])
+  scheduledAt    DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+}
+
+model Goal {
+  id        String   @id @default(cuid())
+  ownerId   String
+  owner     Employee @relation(fields: [ownerId], references: [id])
+  title     String
+  progress  Int      @default(0)
+  dueDate   DateTime?
+  parentId  String?
+  parent    Goal?    @relation("GoalHierarchy", fields: [parentId], references: [id])
+  children  Goal[]   @relation("GoalHierarchy")
+  createdAt DateTime @default(now())
 }
