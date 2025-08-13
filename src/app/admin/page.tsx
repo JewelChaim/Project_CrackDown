@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export default async function AdminHome() {
   const session = await getSession();
-  const role = (session as any)?.user?.role;
+  const role = (session?.user as { role?: string })?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
 
