@@ -20,6 +20,10 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment variables
+
+Copy `.env.example` to `.env` and adjust the values for your setup. In particular, set `NEXTAUTH_URL` to the actual domain of your deployment to avoid redirecting to `http://localhost:3000` during sign in.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
