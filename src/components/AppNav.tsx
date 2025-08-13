@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 
 export default async function AppNav() {
   const session = await getServerSession(authOptions);
-  const role = (session as any)?.user?.role;
+  const role = (session?.user as { role?: string })?.role;
 
   return (
     <header className="sticky top-0 z-40 grad-hero border-b border-panel">
