@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { Stat } from "@/components/ui/Card";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export default async function AdminHome() {
   const session = await getSession();

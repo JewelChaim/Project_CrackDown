@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 async function ensureAdmin() {
   const session = await getSession();
@@ -15,24 +13,22 @@ async function ensureAdmin() {
 
 export default async function FacilitiesPage() {
   await ensureAdmin();
-  const facilities = await prisma.facility.findMany({ orderBy: { createdAt: "desc" } });
+    const facilities = await prisma.facility.findMany({ orderBy: { createdAt: "desc" } });
 
   async function createFacility(formData: FormData) {
     "use server";
     const name = String(formData.get("name") || "").trim();
     if (!name) return;
-    const p = new PrismaClient();
-    await p.facility.create({ data: { name } });
-    redirect("/admin/facilities");
+      await prisma.facility.create({ data: { name } });
+      redirect("/admin/facilities");
   }
 
   async function deleteFacility(formData: FormData) {
     "use server";
     const id = String(formData.get("id") || "");
-    const p = new PrismaClient();
-    await p.employee.deleteMany({ where: { facilityId: id } });
-    await p.facility.delete({ where: { id } });
-    redirect("/admin/facilities");
+      await prisma.employee.deleteMany({ where: { facilityId: id } });
+      await prisma.facility.delete({ where: { id } });
+      redirect("/admin/facilities");
   }
 
   return (
