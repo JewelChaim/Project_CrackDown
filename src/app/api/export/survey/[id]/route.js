@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_request, { params }) {
   const prisma = new PrismaClient();
   const rows = await prisma.surveyResponse.findMany({ where: { surveyId: params.id }, orderBy: { createdAt: "desc" } });
 
@@ -21,4 +21,3 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     }
   });
 }
-

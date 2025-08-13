@@ -6,15 +6,19 @@ import Button from "@/components/ui/Button";
 
 const prisma = new PrismaClient();
 
-export default async function PublicSurvey({ params, searchParams }: { params: { id: string }, searchParams: Record<string,string> }) {
+export default async function PublicSurvey({ params, searchParams }) {
   const survey = await prisma.survey.findUnique({ where: { id: params.id } });
   if (!survey) notFound();
 
-  async function submit(formData: FormData) {
+  async function submit(formData) {
     "use server";
     const payloadTxt = String(formData.get("payload") || "{}");
-    let json: any = {};
-    try { json = JSON.parse(payloadTxt); } catch { json = { text: payloadTxt }; }
+    let json = {};
+    try {
+      json = JSON.parse(payloadTxt);
+    } catch {
+      json = { text: payloadTxt };
+    }
     const p = new PrismaClient();
     await p.surveyResponse.create({ data: { surveyId: survey.id, payload: json } });
     redirect(`/survey/${survey.id}?ok=1`);
