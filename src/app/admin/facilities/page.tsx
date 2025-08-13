@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getSession, requireAdmin } from "@/lib/auth";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -59,7 +62,7 @@ export default async function FacilitiesPage() {
               <input type="hidden" name="id" value={f.id} />
               <Button variant="destructive">Delete</Button>
             </form>
-          </div>
+          </li>
         ))}
         {facilities.length === 0 && <div className="p-3 text-teal-100/60">No facilities yet.</div>}
       </div>

@@ -14,6 +14,9 @@ export default async function PublicSurvey({ params, searchParams }: { params: {
     const payloadTxt = String(formData.get("payload") || "{}");
     let json: Prisma.InputJsonValue = {};
     try { json = JSON.parse(payloadTxt) as Prisma.InputJsonValue; } catch { json = { text: payloadTxt }; }
+    if (!survey) {
+      throw new Error("Survey not found");
+    }
     await prisma.surveyResponse.create({ data: { surveyId: survey.id, payload: json } });
     redirect(`/survey/${survey.id}?ok=1`);
   }
