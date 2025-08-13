@@ -22,7 +22,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Environment variables
 
-Copy `.env.example` to `.env` and adjust the values for your setup. In particular, set `NEXTAUTH_URL` to the actual domain of your deployment to avoid redirecting to `http://localhost:3000` during sign in.
+A sample `.env` (and matching `.env.example`) is included. Update these values for your setup. In particular, set `NEXTAUTH_URL` to the actual domain of your deployment to avoid redirecting to `http://localhost:3000` during sign in.
 
 ## Learn More
 
