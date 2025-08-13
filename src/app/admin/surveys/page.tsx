@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import QRCode from "qrcode";
@@ -7,11 +8,14 @@ import Input from "@/components/ui/Input";
 
 const prisma = new PrismaClient();
 
+interface SessionWithRole {
+  user?: { role?: string; email?: string };
+}
+
 async function ensureAdmin() {
-  const session = await getSession();
-  const role = (session as any)?.user?.role;
+  const session = (await getSession()) as SessionWithRole | null;
   if (!session) redirect("/login");
-  if (role !== "ADMIN") redirect("/");
+  if (session.user?.role !== "ADMIN") redirect("/");
   return session;
 }
 
@@ -24,7 +28,7 @@ export default async function SurveysPage() {
     const title = String(formData.get("title")||"").trim();
     if (!title) return;
     const p = new PrismaClient();
-    await p.survey.create({ data: { title, createdBy: (session as any)?.user?.email || "admin" } });
+    await p.survey.create({ data: { title, createdBy: session.user?.email || "admin" } });
     redirect("/admin/surveys");
   }
 
@@ -43,7 +47,7 @@ export default async function SurveysPage() {
           return (
             <li key={s.id} className="border border-panel rounded bg-panel p-4">
               <div className="flex items-start gap-4">
-                <img src={qr} alt="QR" className="w-24 h-24 border border-panel rounded bg-white" />
+                <Image src={qr} alt="QR" width={96} height={96} className="w-24 h-24 border border-panel rounded bg-white" />
                 <div className="flex-1">
                   <div className="font-medium">{s.title}</div>
                   <div className="text-sm text-teal-100/60">
