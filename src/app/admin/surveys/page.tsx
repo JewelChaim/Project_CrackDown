@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import QRCode from "qrcode";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 async function ensureAdmin() {
   const session = await getSession();
@@ -23,9 +21,8 @@ export default async function SurveysPage() {
     "use server";
     const title = String(formData.get("title")||"").trim();
     if (!title) return;
-    const p = new PrismaClient();
-    await p.survey.create({ data: { title, createdBy: (session as any)?.user?.email || "admin" } });
-    redirect("/admin/surveys");
+      await prisma.survey.create({ data: { title, createdBy: (session as any)?.user?.email || "admin" } });
+      redirect("/admin/surveys");
   }
 
   return (
