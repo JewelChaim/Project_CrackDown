@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function GET(_: NextRequest, { params }: any) {
   const rows = await prisma.surveyResponse.findMany({ where: { surveyId: params.id }, orderBy: { createdAt: "desc" } });
 
   const headers = ["createdAt", "payload"];

@@ -5,17 +5,18 @@ import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import prisma from "@/lib/prisma";
 
-export default async function PublicSurvey({ params, searchParams }: { params: { id: string }, searchParams: Record<string,string> }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function PublicSurvey({ params, searchParams }: any) {
   const survey = await prisma.survey.findUnique({ where: { id: params.id } });
   if (!survey) notFound();
 
   async function submit(formData: FormData) {
     "use server";
     const payloadTxt = String(formData.get("payload") || "{}");
-    let json: Prisma.JsonValue = {};
-    try { json = JSON.parse(payloadTxt) as Prisma.JsonValue; } catch { json = { text: payloadTxt }; }
-    await prisma.surveyResponse.create({ data: { surveyId: survey.id, payload: json } });
-    redirect(`/survey/${survey.id}?ok=1`);
+    let json: Prisma.InputJsonValue = {};
+    try { json = JSON.parse(payloadTxt) as Prisma.InputJsonValue; } catch { json = { text: payloadTxt }; }
+    await prisma.surveyResponse.create({ data: { surveyId: survey!.id, payload: json } });
+    redirect(`/survey/${survey!.id}?ok=1`);
   }
 
   return (
