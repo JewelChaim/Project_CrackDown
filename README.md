@@ -20,6 +20,22 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment variables
+
+A sample `.env` (and matching `.env.example`) is included. Update these values for your setup. In particular, set `NEXTAUTH_URL` to the actual domain of your deployment to avoid redirecting to `http://localhost:3000` during sign in.
+
+If you're working in a GitHub Codespace, the public URL will look like `https://$CODESPACE_NAME-3000.app.github.dev`. Update `NEXTAUTH_URL` in your `.env` to match that address so authentication callbacks reach the codespace instead of `localhost`.
+
+## Running in GitHub Codespaces
+
+This repository ships with a [Dev Container](https://containers.dev/) configuration. To try it:
+
+1. From the repository page, click **Code ➜ Create codespace on main**.
+2. Wait for the container to build and dependencies to install.
+3. Run `npm run dev` to start the Next.js server.
+
+The development server will be available on port 3000 and forwarded to a public `app.github.dev` URL.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
