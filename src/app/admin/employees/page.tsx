@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 async function ensureAdmin() {
   const session = await getSession();
@@ -16,10 +14,10 @@ async function ensureAdmin() {
 
 export default async function EmployeesPage() {
   await ensureAdmin();
-  const [employees, facilities] = await Promise.all([
-    prisma.employee.findMany({ include: { facility: true }, orderBy: { createdAt: "desc" } }),
-    prisma.facility.findMany({ orderBy: { name: "asc" } }),
-  ]);
+    const [employees, facilities] = await Promise.all([
+      prisma.employee.findMany({ include: { facility: true }, orderBy: { createdAt: "desc" } }),
+      prisma.facility.findMany({ orderBy: { name: "asc" } }),
+    ]);
 
   async function createEmployee(formData: FormData) {
     "use server";
@@ -28,17 +26,15 @@ export default async function EmployeesPage() {
     const facilityId = String(formData.get("facilityId")||"");
     const staffType = String(formData.get("staffType")||"INTERNAL") as any;
     if (!name || !facilityId) return;
-    const p = new PrismaClient();
-    await p.employee.create({ data: { name, phone, facilityId, staffType } });
-    redirect("/admin/employees");
+      await prisma.employee.create({ data: { name, phone, facilityId, staffType } });
+      redirect("/admin/employees");
   }
 
   async function deleteEmployee(formData: FormData) {
     "use server";
     const id = String(formData.get("id")||"");
-    const p = new PrismaClient();
-    await p.employee.delete({ where: { id } });
-    redirect("/admin/employees");
+      await prisma.employee.delete({ where: { id } });
+      redirect("/admin/employees");
   }
 
   return (

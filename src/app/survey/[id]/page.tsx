@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import { notFound, redirect } from "next/navigation";
 import { Card, CardBody } from "@/components/ui/Card";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export default async function PublicSurvey({ params, searchParams }: { params: { id: string }, searchParams: Record<string,string> }) {
   const survey = await prisma.survey.findUnique({ where: { id: params.id } });
@@ -15,9 +13,8 @@ export default async function PublicSurvey({ params, searchParams }: { params: {
     const payloadTxt = String(formData.get("payload") || "{}");
     let json: any = {};
     try { json = JSON.parse(payloadTxt); } catch { json = { text: payloadTxt }; }
-    const p = new PrismaClient();
-    await p.surveyResponse.create({ data: { surveyId: survey.id, payload: json } });
-    redirect(`/survey/${survey.id}?ok=1`);
+      await prisma.surveyResponse.create({ data: { surveyId: survey.id, payload: json } });
+      redirect(`/survey/${survey.id}?ok=1`);
   }
 
   return (

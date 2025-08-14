@@ -1,5 +1,11 @@
 const { PrismaClient, Role } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
+    },
+  },
+});
 async function main() {
   await prisma.user.upsert({
     where: { email: "admin@jewelhc.com" },
