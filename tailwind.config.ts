@@ -9,8 +9,8 @@ const config: Config = {
           DEFAULT: "#0EA5A6",
           dark: "#0B7B7E",
           light: "#5EEAD4",
-          bg: "#0B0C10",
-          panel: "#121317"
+          bg: "#0B7B7E",
+          panel: "#0EA5A6"
         }
       },
       boxShadow: {
