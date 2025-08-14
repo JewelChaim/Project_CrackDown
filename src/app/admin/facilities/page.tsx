@@ -1,14 +1,17 @@
-import { PrismaClient } from "@prisma/client";
+import type { Session } from "next-auth";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
-const prisma = new PrismaClient();
+interface AppSession extends Session {
+  user?: Session["user"] & { role?: string };
+}
 
 async function ensureAdmin() {
-  const session = await getSession();
-  const role = (session as any)?.user?.role;
+  const session = (await getSession()) as AppSession | null;
+  const role = session?.user?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
 }
@@ -21,17 +24,15 @@ export default async function FacilitiesPage() {
     "use server";
     const name = String(formData.get("name") || "").trim();
     if (!name) return;
-    const p = new PrismaClient();
-    await p.facility.create({ data: { name } });
+    await prisma.facility.create({ data: { name } });
     redirect("/admin/facilities");
   }
 
   async function deleteFacility(formData: FormData) {
     "use server";
     const id = String(formData.get("id") || "");
-    const p = new PrismaClient();
-    await p.employee.deleteMany({ where: { facilityId: id } });
-    await p.facility.delete({ where: { id } });
+    await prisma.employee.deleteMany({ where: { facilityId: id } });
+    await prisma.facility.delete({ where: { id } });
     redirect("/admin/facilities");
   }
 
