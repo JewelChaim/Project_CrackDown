@@ -45,9 +45,9 @@ export default async function SurveysPage() {
           const href = `/survey/${s.id}`;
           const qr = await QRCode.toDataURL(href);
           return (
-            <li key={s.id} className="border border-panel rounded bg-panel p-4">
+            <li key={s.id} className="border border-brand/20 rounded-xl bg-panel p-4 shadow-md transition hover:shadow-lg">
               <div className="flex items-start gap-4">
-                <Image src={qr} alt="QR" width={96} height={96} className="w-24 h-24 border border-panel rounded bg-white" unoptimized />
+                <Image src={qr} alt="QR" width={96} height={96} className="w-24 h-24 border border-brand/20 rounded bg-white" unoptimized />
                 <div className="flex-1">
                   <div className="font-medium">{s.title}</div>
                   <div className="text-sm text-teal-100/60">

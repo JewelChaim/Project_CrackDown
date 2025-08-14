@@ -25,18 +25,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 :root {
-  --bg: #0B1115;
-  --panel: rgba(255,255,255,0.06);
-  --ring: #22D3EE33;
+  --color-brand: #0EA5A6;
+  --color-brand-dark: #0B7B7E;
+  --color-accent: #5EEAD4;
+  --bg: #0B0C10;
+  --panel: #121317;
+  --ring: #5EEAD444;
 }
-html, body { background: var(--bg); color: #e6f8f9; }
-a { color: #8CEAEC; }
+html, body { background: var(--bg); color: #f0f9f9; }
+a { color: var(--color-accent); }
 .bg-panel { background: var(--panel); }
-.border-panel { border-color: rgba(255,255,255,0.12); }
+.border-panel { border-color: rgba(255,255,255,0.1); }
 .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .grad-hero {
   background:
-    radial-gradient(1200px 600px at 20% -10%, #22D3EE22 0%, transparent 60%),
-    radial-gradient(1000px 500px at 100% 0%, #0EA5A644 0%, transparent 55%);
+    radial-gradient(1200px 600px at 20% -10%, var(--color-accent)22 0%, transparent 60%),
+    radial-gradient(1000px 500px at 100% 0%, var(--color-brand)44 0%, transparent 55%);
 }
 input, select, textarea { color-scheme: dark; }

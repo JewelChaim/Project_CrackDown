@@ -66,7 +66,7 @@ export default async function EmployeesPage() {
         </div>
       </form>
 
-      <div className="divide-y border border-panel rounded bg-panel">
+      <div className="divide-y border border-brand/20 rounded-xl bg-panel shadow-md">
         {employees.map(e => (
           <div key={e.id} className="flex items-center justify-between p-3">
             <div>
@@ -76,7 +76,7 @@ export default async function EmployeesPage() {
             </div>
             <form action={deleteEmployee} method="post">
               <input type="hidden" name="id" value={e.id} />
-              <Button type="submit" variant="destructive">Delete</Button>
+              <Button type="submit" variant="danger">Delete</Button>
             </form>
           </div>
         ))}

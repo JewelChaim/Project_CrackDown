@@ -48,13 +48,13 @@ export default async function FacilitiesPage() {
         <Button type="submit">Add</Button>
       </form>
 
-      <div className="divide-y border border-panel rounded bg-panel">
+      <div className="divide-y border border-brand/20 rounded-xl bg-panel shadow-md">
         {facilities.map(f => (
           <div key={f.id} className="flex items-center justify-between p-3">
             <div>{f.name}</div>
             <form action={deleteFacility} method="post">
               <input type="hidden" name="id" value={f.id} />
-              <Button type="submit" variant="destructive">Delete</Button>
+              <Button type="submit" variant="danger">Delete</Button>
             </form>
           </div>
         ))}
