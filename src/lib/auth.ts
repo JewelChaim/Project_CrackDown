@@ -11,7 +11,7 @@ export function getSession() {
   return getServerSession(authOptions);
 }
 
-export async function requireAdmin() {
+export async function ensureAdmin() {
   const session = (await getServerSession(authOptions)) as AppSession | null;
   const role = session?.user?.role;
   if (!session) redirect("/login");

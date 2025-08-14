@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound, redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { ensureAdmin } from "@/lib/auth";
 import type { Question } from "@/types/survey";
 import { Card, CardBody } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
@@ -17,6 +18,7 @@ export default async function PublicSurvey({ params, searchParams }: { params: P
 
   async function submit(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const entries: Record<string, any> = {};
     for (const q of questions) {
       const key = `q_${q.id}`;

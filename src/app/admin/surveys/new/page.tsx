@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/auth";
+import { ensureAdmin } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import SurveyBuilder from "@/components/surveys/Builder";
 import Button from "@/components/ui/Button";
@@ -7,11 +7,11 @@ import { Card, CardBody } from "@/components/ui/Card";
 import type { SurveyDraft } from "@/types/survey";
 
 export default async function NewSurveyPage() {
-  await requireAdmin();
+  await ensureAdmin();
 
   async function create(formData: FormData) {
     "use server";
-    const session = await requireAdmin();
+    const session = await ensureAdmin();
     const raw = String(formData.get("draft") || "{}");
     let draft: SurveyDraft;
     try { draft = JSON.parse(raw) as SurveyDraft; } catch { throw new Error("Invalid form payload"); }
