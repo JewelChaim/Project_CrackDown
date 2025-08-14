@@ -28,11 +28,14 @@ body {
   --color-brand: #0EA5A6;
   --color-brand-dark: #0B7B7E;
   --color-accent: #5EEAD4;
-  --bg: #0B0C10;
-  --panel: #121317;
+  --bg: #0B7B7E;
+  --panel: #0EA5A6;
   --ring: #5EEAD444;
 }
-html, body { background: var(--bg); color: #f0f9f9; }
+html, body {
+  background: linear-gradient(to bottom, var(--color-brand), var(--color-brand-dark));
+  color: #f0f9f9;
+}
 a { color: var(--color-accent); }
 .bg-panel { background: var(--panel); }
 .border-panel { border-color: rgba(255,255,255,0.1); }
