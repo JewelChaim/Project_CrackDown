@@ -1,21 +1,8 @@
-import type { Session } from "next-auth";
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { ensureAdmin } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-
-interface AppSession extends Session {
-  user?: Session["user"] & { role?: string };
-}
-
-async function ensureAdmin() {
-  const session = (await getSession()) as AppSession | null;
-  const role = session?.user?.role;
-  if (!session) redirect("/login");
-  if (role !== "ADMIN") redirect("/");
-  return session;
-}
 
 export default async function FacilitiesPage() {
   await ensureAdmin();
