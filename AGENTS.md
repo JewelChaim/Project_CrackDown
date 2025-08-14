@@ -6,4 +6,3 @@
 - Run `npm run lint` and `npm run build` before committing changes.
 - Forms that call server actions must set `method="post"` so submissions trigger on button clicks.
 - Server actions that modify data should call `ensureAdmin()` to revalidate the session and enforce admin access.
-- The `qrcode` library requires `@types/qrcode` for TypeScript; ensure the dev dependency is installed.
