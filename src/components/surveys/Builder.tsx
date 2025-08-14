@@ -1,7 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useId, useMemo, useState } from "react";
-import type { Question, QuestionType, SurveyDraft } from "@/types/survey";
+import type {
+  Question,
+  QuestionType,
+  SurveyDraft,
+  ShortTextQuestion,
+  LongTextQuestion,
+  YesNoQuestion,
+  RatingQuestion,
+  SelectQuestion,
+} from "@/types/survey";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
@@ -11,12 +19,47 @@ function cuid() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-const TEMPLATE_BY_TYPE: Record<QuestionType, () => Question> = {
-  short_text: () => ({ id: cuid(), type: "short_text", label: "Short answer", required: false, helpText: "", placeholder: "" }),
-  long_text:  () => ({ id: cuid(), type: "long_text",  label: "Long answer",  required: false, helpText: "", placeholder: "" }),
-  yes_no:     () => ({ id: cuid(), type: "yes_no",     label: "Yes / No",     required: false, helpText: "" }),
-  rating:     () => ({ id: cuid(), type: "rating",     label: "Rating",       required: false, helpText: "", max: 5 }),
-  select:     () => ({ id: cuid(), type: "select",     label: "Select",       required: false, helpText: "", options: ["Option 1"], multiple: false }),
+const TEMPLATE_BY_TYPE: { [K in QuestionType]: () => Extract<Question, { type: K }> } = {
+  short_text: () => ({
+    id: cuid(),
+    type: "short_text",
+    label: "Short answer",
+    required: false,
+    helpText: "",
+    placeholder: "",
+  }),
+  long_text: () => ({
+    id: cuid(),
+    type: "long_text",
+    label: "Long answer",
+    required: false,
+    helpText: "",
+    placeholder: "",
+  }),
+  yes_no: () => ({
+    id: cuid(),
+    type: "yes_no",
+    label: "Yes / No",
+    required: false,
+    helpText: "",
+  }),
+  rating: () => ({
+    id: cuid(),
+    type: "rating",
+    label: "Rating",
+    required: false,
+    helpText: "",
+    max: 5,
+  }),
+  select: () => ({
+    id: cuid(),
+    type: "select",
+    label: "Select",
+    required: false,
+    helpText: "",
+    options: ["Option 1"],
+    multiple: false,
+  }),
 };
 
 type Props = { initial?: Partial<SurveyDraft> };
@@ -32,7 +75,14 @@ export default function SurveyBuilder({ initial }: Props) {
   const [questions, setQuestions] = useState<Question[]>(initial?.questions ?? []);
 
   function addQuestion(type: QuestionType) { setQuestions(qs => [...qs, TEMPLATE_BY_TYPE[type]()]); }
-  function updateQuestion(id: string, patch: Partial<Question>) { setQuestions(qs => qs.map(q => q.id === id ? { ...q, ...patch } as Question : q)); }
+  function updateQuestion(id: string, patch: Partial<ShortTextQuestion>): void;
+  function updateQuestion(id: string, patch: Partial<LongTextQuestion>): void;
+  function updateQuestion(id: string, patch: Partial<YesNoQuestion>): void;
+  function updateQuestion(id: string, patch: Partial<RatingQuestion>): void;
+  function updateQuestion(id: string, patch: Partial<SelectQuestion>): void;
+  function updateQuestion(id: string, patch: Partial<Question>) {
+    setQuestions(qs => qs.map(q => (q.id === id ? ({ ...q, ...patch } as Question) : q)));
+  }
   function removeQuestion(id: string) { setQuestions(qs => qs.filter(q => q.id !== id)); }
   function moveQuestion(id: string, dir: -1 | 1) {
     setQuestions(qs => {
@@ -61,7 +111,7 @@ export default function SurveyBuilder({ initial }: Props) {
         </div>
         <div className="space-y-2">
           <label className="text-sm">Status</label>
-          <Select value={status} onChange={(e)=>setStatus(e.target.value as any)}>
+          <Select value={status} onChange={(e)=>setStatus(e.target.value as "DRAFT" | "PUBLISHED" | "ARCHIVED")}>
             <option value="DRAFT">Draft</option>
             <option value="PUBLISHED">Published</option>
             <option value="ARCHIVED">Archived</option>
@@ -124,30 +174,30 @@ export default function SurveyBuilder({ initial }: Props) {
                   <Input value={q.helpText ?? ""} onChange={(e)=>updateQuestion(q.id, { helpText: e.target.value })} placeholder="Shown under the label (optional)" />
                 </div>
 
-                {(q.type === "short_text" || q.type === "long_text") && (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm">Placeholder</label>
-                    <Input value={(q as any).placeholder ?? ""} onChange={(e)=>updateQuestion(q.id, { placeholder: e.target.value } as any)} />
-                  </div>
-                )}
+                  {(q.type === "short_text" || q.type === "long_text") && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm">Placeholder</label>
+                      <Input value={q.placeholder ?? ""} onChange={(e)=>updateQuestion(q.id, { placeholder: e.target.value })} />
+                    </div>
+                  )}
 
-                {q.type === "rating" && (
-                  <div className="space-y-2">
-                    <label className="text-sm">Max</label>
-                    <Input type="number" min={3} max={10} value={(q as any).max ?? 5} onChange={(e)=>updateQuestion(q.id, { max: Number(e.target.value) } as any)} />
-                  </div>
-                )}
+                  {q.type === "rating" && (
+                    <div className="space-y-2">
+                      <label className="text-sm">Max</label>
+                      <Input type="number" min={3} max={10} value={q.max ?? 5} onChange={(e)=>updateQuestion(q.id, { max: Number(e.target.value) })} />
+                    </div>
+                  )}
 
-                {q.type === "select" && (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm">Options (comma‑separated)</label>
-                    <Input value={(q as any).options?.join(", ") ?? ""} onChange={(e)=>updateQuestion(q.id, { options: e.target.value.split(",").map(s=>s.trim()).filter(Boolean) } as any)} placeholder="Yes, No, Maybe" />
-                    <label className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" checked={!!(q as any).multiple} onChange={(e)=>updateQuestion(q.id, { multiple: e.target.checked } as any)} />
-                      Allow multiple selection
-                    </label>
-                  </div>
-                )}
+                  {q.type === "select" && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm">Options (comma‑separated)</label>
+                      <Input value={q.options?.join(", ") ?? ""} onChange={(e)=>updateQuestion(q.id, { options: e.target.value.split(",").map(s=>s.trim()).filter(Boolean) })} placeholder="Yes, No, Maybe" />
+                      <label className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" checked={!!q.multiple} onChange={(e)=>updateQuestion(q.id, { multiple: e.target.checked })} />
+                        Allow multiple selection
+                      </label>
+                    </div>
+                  )}
               </div>
             </li>
           ))}
