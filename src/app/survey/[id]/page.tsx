@@ -31,7 +31,7 @@ export default async function PublicSurvey({ params, searchParams }: { params: P
         <h1 className="text-xl font-semibold">{survey.title}</h1>
         {sp?.ok && <div className="mt-3 text-sm text-teal-200">Thanks! Response recorded.</div>}
         <p className="text-sm text-teal-100/70 mt-2">Paste JSON or type text; we’ll store it as JSON.</p>
-        <form action={submit} className="space-y-3 mt-4">
+        <form action={submit} method="post" className="space-y-3 mt-4">
           <Textarea name="payload" rows={10} placeholder='{"answer":"Yes"}' />
           <Button type="submit">Submit</Button>
         </form>
