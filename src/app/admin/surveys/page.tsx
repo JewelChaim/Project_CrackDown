@@ -20,11 +20,12 @@ async function ensureAdmin() {
 }
 
 export default async function SurveysPage() {
-  const session = await ensureAdmin();
+  await ensureAdmin();
   const surveys = await prisma.survey.findMany({ orderBy: { createdAt: "desc" } });
 
   async function createSurvey(formData: FormData) {
     "use server";
+    const session = await ensureAdmin();
     const title = String(formData.get("title") || "").trim();
     if (!title) return;
     await prisma.survey.create({ data: { title, createdBy: session.user?.email ?? "admin" } });
