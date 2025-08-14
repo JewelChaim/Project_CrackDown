@@ -34,7 +34,12 @@ export default async function SurveysPage() {
 
   return (
     <main className="space-y-6">
-      <h1 className="text-2xl font-semibold">Surveys</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Surveys</h1>
+        <a href="/admin/surveys/new">
+          <Button type="button">Create survey</Button>
+        </a>
+      </div>
       <form action={createSurvey} method="post" className="flex gap-2 max-w-xl">
         <Input name="title" placeholder="New survey title" />
         <Button type="submit">Create</Button>
