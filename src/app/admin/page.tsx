@@ -24,9 +24,9 @@ export default async function AdminHome() {
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
       <div className="grid sm:grid-cols-3 gap-4">
-        <Stat label="Facilities" value={facilityCount} />
-        <Stat label="Employees" value={employeeCount} />
-        <Stat label="Surveys" value={surveyCount} />
+        <Stat label="Facilities" value={facilityCount} icon="🏥" />
+        <Stat label="Employees" value={employeeCount} icon="👥" />
+        <Stat label="Surveys" value={surveyCount} icon="📋" />
       </div>
     </main>
   );
