@@ -16,6 +16,7 @@ async function ensureAdmin() {
   const role = session?.user?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
+  return session;
 }
 
 export default async function EmployeesPage() {
@@ -27,6 +28,7 @@ export default async function EmployeesPage() {
 
   async function createEmployee(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const name = String(formData.get("name") || "").trim();
     const phone = String(formData.get("phone") || "").trim() || null;
     const facilityId = String(formData.get("facilityId") || "");
@@ -38,6 +40,7 @@ export default async function EmployeesPage() {
 
   async function deleteEmployee(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const id = String(formData.get("id") || "");
     await prisma.employee.delete({ where: { id } });
     redirect("/admin/employees");

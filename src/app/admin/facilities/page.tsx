@@ -14,6 +14,7 @@ async function ensureAdmin() {
   const role = session?.user?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
+  return session;
 }
 
 export default async function FacilitiesPage() {
@@ -22,6 +23,7 @@ export default async function FacilitiesPage() {
 
   async function createFacility(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const name = String(formData.get("name") || "").trim();
     if (!name) return;
     await prisma.facility.create({ data: { name } });
@@ -30,6 +32,7 @@ export default async function FacilitiesPage() {
 
   async function deleteFacility(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const id = String(formData.get("id") || "");
     await prisma.employee.deleteMany({ where: { facilityId: id } });
     await prisma.facility.delete({ where: { id } });
