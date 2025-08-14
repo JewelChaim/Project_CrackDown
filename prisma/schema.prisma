@@ -44,12 +44,26 @@ enum StaffType {
   AGENCY
 }
 
+enum SurveyStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 model Survey {
-  id        String           @id @default(cuid())
-  title     String
-  createdBy String
-  createdAt DateTime         @default(now())
-  responses SurveyResponse[]
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  status       SurveyStatus @default(DRAFT)
+  allowAnon    Boolean      @default(true)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  questions    Json?        // array of Question objects
+  createdBy    String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+
+  responses    SurveyResponse[]
 }
 
 model SurveyResponse {
