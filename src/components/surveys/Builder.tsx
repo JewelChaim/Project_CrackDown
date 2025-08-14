@@ -1,5 +1,5 @@
 "use client";
-import React, { useId, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import type {
   Question,
   QuestionType,
@@ -65,7 +65,6 @@ const TEMPLATE_BY_TYPE: { [K in QuestionType]: () => Extract<Question, { type: K
 type Props = { initial?: Partial<SurveyDraft> };
 
 export default function SurveyBuilder({ initial }: Props) {
-  const formId = useId();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(initial?.status ?? "DRAFT");
@@ -205,7 +204,7 @@ export default function SurveyBuilder({ initial }: Props) {
       </section>
 
       {/* Hidden serializer for the server action form on the page */}
-      <input type="hidden" name="draft" value={JSON.stringify(asDraft)} form={formId} />
+      <input type="hidden" name="draft" value={JSON.stringify(asDraft)} />
     </div>
   );
 }
