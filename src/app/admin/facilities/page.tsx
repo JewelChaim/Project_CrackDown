@@ -1,16 +1,20 @@
-import { PrismaClient } from "@prisma/client";
+import type { Session } from "next-auth";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
-const prisma = new PrismaClient();
+interface AppSession extends Session {
+  user?: Session["user"] & { role?: string };
+}
 
 async function ensureAdmin() {
-  const session = await getSession();
-  const role = (session as any)?.user?.role;
+  const session = (await getSession()) as AppSession | null;
+  const role = session?.user?.role;
   if (!session) redirect("/login");
   if (role !== "ADMIN") redirect("/");
+  return session;
 }
 
 export default async function FacilitiesPage() {
@@ -19,19 +23,19 @@ export default async function FacilitiesPage() {
 
   async function createFacility(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const name = String(formData.get("name") || "").trim();
     if (!name) return;
-    const p = new PrismaClient();
-    await p.facility.create({ data: { name } });
+    await prisma.facility.create({ data: { name } });
     redirect("/admin/facilities");
   }
 
   async function deleteFacility(formData: FormData) {
     "use server";
+    await ensureAdmin();
     const id = String(formData.get("id") || "");
-    const p = new PrismaClient();
-    await p.employee.deleteMany({ where: { facilityId: id } });
-    await p.facility.delete({ where: { id } });
+    await prisma.employee.deleteMany({ where: { facilityId: id } });
+    await prisma.facility.delete({ where: { id } });
     redirect("/admin/facilities");
   }
 
@@ -39,7 +43,7 @@ export default async function FacilitiesPage() {
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Facilities</h1>
 
-      <form action={createFacility} className="flex gap-2 max-w-xl">
+      <form action={createFacility} method="post" className="flex gap-2 max-w-xl">
         <Input name="name" placeholder="New facility name" />
         <Button type="submit">Add</Button>
       </form>
@@ -48,9 +52,9 @@ export default async function FacilitiesPage() {
         {facilities.map(f => (
           <div key={f.id} className="flex items-center justify-between p-3">
             <div>{f.name}</div>
-            <form action={deleteFacility}>
+            <form action={deleteFacility} method="post">
               <input type="hidden" name="id" value={f.id} />
-              <Button variant="destructive">Delete</Button>
+              <Button type="submit" variant="destructive">Delete</Button>
             </form>
           </div>
         ))}

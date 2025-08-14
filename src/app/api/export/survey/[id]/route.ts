@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const prisma = new PrismaClient();
-  const rows = await prisma.surveyResponse.findMany({ where: { surveyId: params.id }, orderBy: { createdAt: "desc" } });
+export async function GET(req: NextRequest) {
+  const segments = req.nextUrl.pathname.split("/");
+  const id = segments[segments.length - 1];
+  const rows = await prisma.surveyResponse.findMany({ where: { surveyId: id }, orderBy: { createdAt: "desc" } });
 
   const headers = ["createdAt", "payload"];
   const csv = [
@@ -17,7 +18,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv",
-      "Content-Disposition": `attachment; filename="survey_${params.id}.csv"`
+      "Content-Disposition": `attachment; filename="survey_${id}.csv"`
     }
   });
 }
