@@ -35,7 +35,7 @@ export default async function SurveysPage() {
   return (
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Surveys</h1>
-      <form action={createSurvey} className="flex gap-2 max-w-xl">
+      <form action={createSurvey} method="post" className="flex gap-2 max-w-xl">
         <Input name="title" placeholder="New survey title" />
         <Button type="submit">Create</Button>
       </form>

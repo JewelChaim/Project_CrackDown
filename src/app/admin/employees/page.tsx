@@ -47,7 +47,7 @@ export default async function EmployeesPage() {
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Employees</h1>
 
-      <form action={createEmployee} className="grid grid-cols-5 gap-2 max-w-5xl">
+      <form action={createEmployee} method="post" className="grid grid-cols-5 gap-2 max-w-5xl">
         <Input name="name" placeholder="Full name" className="col-span-2" />
         <Input name="phone" placeholder="Phone (optional)" />
         <Select name="facilityId">
@@ -71,9 +71,9 @@ export default async function EmployeesPage() {
               <div className="text-sm text-teal-100/60">{e.facility?.name}</div>
               {e.phone && <div className="text-sm text-teal-100/60">{e.phone}</div>}
             </div>
-            <form action={deleteEmployee}>
+            <form action={deleteEmployee} method="post">
               <input type="hidden" name="id" value={e.id} />
-              <Button variant="destructive">Delete</Button>
+              <Button type="submit" variant="destructive">Delete</Button>
             </form>
           </div>
         ))}

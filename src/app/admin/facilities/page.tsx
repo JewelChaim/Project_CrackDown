@@ -40,7 +40,7 @@ export default async function FacilitiesPage() {
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Facilities</h1>
 
-      <form action={createFacility} className="flex gap-2 max-w-xl">
+      <form action={createFacility} method="post" className="flex gap-2 max-w-xl">
         <Input name="name" placeholder="New facility name" />
         <Button type="submit">Add</Button>
       </form>
@@ -49,9 +49,9 @@ export default async function FacilitiesPage() {
         {facilities.map(f => (
           <div key={f.id} className="flex items-center justify-between p-3">
             <div>{f.name}</div>
-            <form action={deleteFacility}>
+            <form action={deleteFacility} method="post">
               <input type="hidden" name="id" value={f.id} />
-              <Button variant="destructive">Delete</Button>
+              <Button type="submit" variant="destructive">Delete</Button>
             </form>
           </div>
         ))}
