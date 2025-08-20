@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import type {
   Question,
   QuestionType,
@@ -73,6 +73,8 @@ export default function SurveyBuilder({ initial }: Props) {
   const [endsAt, setEndsAt] = useState<string>(initial?.endsAt ?? "");
   const [questions, setQuestions] = useState<Question[]>(initial?.questions ?? []);
 
+  const draftRef = useRef<HTMLInputElement>(null);
+
   function addQuestion(type: QuestionType) { setQuestions(qs => [...qs, TEMPLATE_BY_TYPE[type]()]); }
   function updateQuestion(id: string, patch: Partial<ShortTextQuestion>): void;
   function updateQuestion(id: string, patch: Partial<LongTextQuestion>): void;
@@ -100,6 +102,10 @@ export default function SurveyBuilder({ initial }: Props) {
     endsAt: endsAt || undefined,
     questions,
   }), [title, description, status, allowAnon, startsAt, endsAt, questions]);
+
+  useEffect(() => {
+    if (draftRef.current) draftRef.current.value = JSON.stringify(asDraft);
+  }, [asDraft]);
 
   return (
     <div className="space-y-6">
@@ -204,7 +210,7 @@ export default function SurveyBuilder({ initial }: Props) {
       </section>
 
       {/* Hidden serializer for the server action form on the page */}
-      <input type="hidden" name="draft" value={JSON.stringify(asDraft)} />
+      <input type="hidden" name="draft" ref={draftRef} />
     </div>
   );
 }
