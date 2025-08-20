@@ -45,7 +45,7 @@ export default async function FacilitiesPage() {
             </form>
           </div>
         ))}
-        {facilities.length === 0 && <div className="p-3 text-teal-100/60">No facilities yet.</div>}
+        {facilities.length === 0 && <div className="p-3 text-gray-500">No facilities yet.</div>}
       </div>
     </main>
   );

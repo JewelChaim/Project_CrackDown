@@ -8,9 +8,8 @@ import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 
-export default async function PublicSurvey({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string,string>>; }) {
+export default async function PublicSurvey({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const sp = await searchParams;
   const survey = await prisma.survey.findUnique({ where: { id } });
   if (!survey) notFound();
   const surveyId = survey.id;
@@ -29,21 +28,20 @@ export default async function PublicSurvey({ params, searchParams }: { params: P
       } else { entries[q.label] = formData.get(key); }
     }
     await prisma.surveyResponse.create({ data: { surveyId, payload: entries } });
-    redirect(`/survey/${surveyId}?ok=1`);
+    redirect(`/thank-you`);
   }
 
   return (
     <Card className="max-w-3xl mx-auto">
       <CardBody>
         <h1 className="text-xl font-semibold">{survey.title}</h1>
-        {survey.description && <p className="text-sm text-teal-100/80 mt-1">{survey.description}</p>}
-        {sp?.ok && <div className="mt-3 text-sm text-teal-200">Thanks! Response recorded.</div>}
+        {survey.description && <p className="text-sm text-gray-600 mt-1">{survey.description}</p>}
 
         <form action={submit} method="post" className="space-y-4 mt-6">
           {questions.map(q => (
             <div key={q.id} className="space-y-1">
               <label className="text-sm font-medium">{q.label}{q.required ? " *" : ""}</label>
-              {q.helpText && <div className="text-xs text-teal-100/70">{q.helpText}</div>}
+              {q.helpText && <div className="text-xs text-gray-500">{q.helpText}</div>}
               {q.type === "short_text" && <Input name={`q_${q.id}`} required={!!q.required} placeholder={(q as any).placeholder || ""} />}
               {q.type === "long_text"  && <Textarea name={`q_${q.id}`} required={!!q.required} rows={4} placeholder={(q as any).placeholder || ""} />}
               {q.type === "yes_no" && (

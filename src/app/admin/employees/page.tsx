@@ -57,9 +57,9 @@ export default async function EmployeesPage() {
         {employees.map(e => (
           <div key={e.id} className="flex items-center justify-between p-3">
             <div>
-              <div className="font-medium">{e.name} <span className="text-xs text-teal-100/60">({e.staffType})</span></div>
-              <div className="text-sm text-teal-100/60">{e.facility?.name}</div>
-              {e.phone && <div className="text-sm text-teal-100/60">{e.phone}</div>}
+              <div className="font-medium">{e.name} <span className="text-xs text-gray-500">({e.staffType})</span></div>
+              <div className="text-sm text-gray-500">{e.facility?.name}</div>
+              {e.phone && <div className="text-sm text-gray-500">{e.phone}</div>}
             </div>
             <form action={deleteEmployee} method="post">
               <input type="hidden" name="id" value={e.id} />
@@ -67,7 +67,7 @@ export default async function EmployeesPage() {
             </form>
           </div>
         ))}
-        {employees.length === 0 && <div className="p-3 text-teal-100/60">No employees yet.</div>}
+        {employees.length === 0 && <div className="p-3 text-gray-500">No employees yet.</div>}
       </div>
     </main>
   );
