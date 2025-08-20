@@ -152,12 +152,12 @@ export default function SurveyBuilder({ initial }: Props) {
       </section>
 
       <section className="space-y-3">
-        {questions.length === 0 && <div className="text-sm text-teal-100/70">No questions yet — add some above.</div>}
+        {questions.length === 0 && <div className="text-sm text-gray-500">No questions yet — add some above.</div>}
         <ul className="space-y-3">
           {questions.map((q, i) => (
             <li key={q.id} className="bg-panel border border-panel rounded-xl p-4">
               <div className="flex items-center justify-between">
-                <div className="text-xs uppercase tracking-wider text-teal-100/70">{q.type.replace("_"," ")}</div>
+                <div className="text-xs uppercase tracking-wider text-gray-500">{q.type.replace("_"," ")}</div>
                 <div className="flex gap-2">
                   <Button type="button" variant="secondary" onClick={()=>moveQuestion(q.id, -1)} disabled={i===0}>↑</Button>
                   <Button type="button" variant="secondary" onClick={()=>moveQuestion(q.id, +1)} disabled={i===questions.length-1}>↓</Button>

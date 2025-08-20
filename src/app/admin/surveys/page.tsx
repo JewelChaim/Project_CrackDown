@@ -42,10 +42,10 @@ export default async function SurveysPage() {
                 <Image src={qr} alt="QR" width={96} height={96} className="w-24 h-24 border border-brand/20 rounded bg-white" unoptimized />
                 <div className="flex-1">
                   <div className="font-medium">{s.title}</div>
-                  <div className="text-sm text-teal-100/60">
+                  <div className="text-sm text-gray-500">
                     Link: <a className="underline" href={href}>{href}</a>
                   </div>
-                  <div className="text-sm text-teal-100/60">
+                  <div className="text-sm text-gray-500">
                     <a className="underline" href={`/api/export/survey/${s.id}`}>Download CSV</a>
                   </div>
                 </div>

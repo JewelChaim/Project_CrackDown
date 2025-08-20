@@ -22,9 +22,9 @@ export function Stat({
 }) {
   return (
     <div className="p-4 rounded-xl bg-panel border border-brand/20 flex items-center gap-3 shadow-sm transition hover:shadow-md hover:scale-[1.02]">
-      {icon && <div className="text-brand text-xl">{icon}</div>}
+      {icon && <div className="text-gray-700 text-xl">{icon}</div>}
       <div>
-        <div className="text-xs uppercase tracking-wider text-brand">{label}</div>
+        <div className="text-xs uppercase tracking-wider text-gray-500">{label}</div>
         <div className="text-2xl font-semibold mt-1">{value}</div>
       </div>
     </div>

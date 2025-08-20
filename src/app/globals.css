@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
 }
 
 @theme inline {
@@ -15,7 +15,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #333333;
   }
 }
 
@@ -34,9 +34,9 @@ body {
 }
 html, body {
   background: linear-gradient(to bottom, var(--color-brand), var(--color-brand-dark));
-  color: #f0f9f9;
+  color: var(--foreground);
 }
-a { color: var(--color-accent); }
+a { color: var(--foreground); }
 .bg-panel { background: var(--panel); }
 .border-panel { border-color: rgba(255,255,255,0.1); }
 .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -45,4 +45,4 @@ a { color: var(--color-accent); }
     radial-gradient(1200px 600px at 20% -10%, var(--color-accent)22 0%, transparent 60%),
     radial-gradient(1000px 500px at 100% 0%, var(--color-brand)44 0%, transparent 55%);
 }
-input, select, textarea { color-scheme: dark; }
+input, select, textarea { color-scheme: light; }

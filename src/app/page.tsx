@@ -7,7 +7,7 @@ export default function Home() {
     <>
       <section className="rounded-xl bg-panel glass border border-brand/20 p-10 shadow-md">
         <h1 className="text-3xl font-semibold mb-2">Welcome to Project CrackDown</h1>
-        <p className="text-teal-100/80 max-w-2xl">Manage facilities, staff, and lightweight surveys. Fast, secure, on-brand.</p>
+        <p className="text-gray-600 max-w-2xl">Manage facilities, staff, and lightweight surveys. Fast, secure, on-brand.</p>
         <div className="mt-6 flex gap-3">
           <Link href="/login" className={buttonVariants("primary")}>Sign in</Link>
           <Link href="/admin" className={buttonVariants("secondary")}>Admin</Link>

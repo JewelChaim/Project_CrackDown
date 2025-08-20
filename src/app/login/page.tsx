@@ -18,7 +18,7 @@ export default function LoginPage() {
           <Input placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)} />
           <Button onClick={()=>signIn("credentials", { email, password, callbackUrl: "/admin" })}>Continue</Button>
         </div>
-        <p className="text-xs text-teal-100/60 mt-4">Dev mode: password not validated; email must exist.</p>
+        <p className="text-xs text-gray-500 mt-4">Dev mode: password not validated; email must exist.</p>
       </CardBody>
     </Card>
   );
